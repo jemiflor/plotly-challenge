@@ -100,8 +100,9 @@ function drawTop10CultureChart(individualId){
         title: "Top 10 Bacteria Cultures Found"
     }
 
+    var config = {responsive: true}
     //plot
-    Plotly.newPlot("top-10-cultures", trace, layout)
+    Plotly.newPlot("top-10-cultures", trace, layout, config)
 }
 
 function drawSamplesBubbleChart(individualId){
@@ -141,8 +142,10 @@ function drawSamplesBubbleChart(individualId){
         }         
     }
 
+    var config = {responsive: true}
+
     //plot
-    Plotly.newPlot("samples-bubble-chart", trace, layout)
+    Plotly.newPlot("samples-bubble-chart", trace, layout, config)
 }
 
 function drawWashFrequencyGauge(individualId){
@@ -184,7 +187,9 @@ function drawWashFrequencyGauge(individualId){
         title: "Belly Button Washing Frequency"             
     }
 
+    var config = {responsive: true}
+
     //plot
-    Plotly.newPlot("wash-freq-gauge", trace, layout)
+    Plotly.newPlot("wash-freq-gauge", trace, layout, config)
 
 }

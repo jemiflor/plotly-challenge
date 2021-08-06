@@ -11,3 +11,7 @@
   .margin-neg-3 {
       margin-top: -3rem !important;
   }
+
+  .bubble-width {
+      width: 95%;
+  }
