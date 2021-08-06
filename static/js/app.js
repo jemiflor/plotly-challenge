@@ -9,10 +9,7 @@ d3.select('#individual-select')
   .on('change', function() {
     
     var selectedValue = d3.select(this).property('value');
-    var selectedIndividual = parseInt(selectedValue) || 0;
-
-    loadMetadata(selectedIndividual);
-    drawTop10CultureChart(selectedValue);
+    loadVisualizations(selectedValue);
 });
 
 d3.json("../plotly-challenge/data/samples.json")
@@ -41,12 +38,20 @@ function loadIndividualDropDown(names){
         var counter = 0;
         individualSelectOptions.property("selected", function(d) {
             if (counter === 0){
-                loadMetadata(parseInt(d)||0);
-                drawTop10CultureChart(d);
+                loadVisualizations(d);
             }
             counter ++;
             return counter === 1;          
         });
+}
+
+function loadVisualizations(individualIdString){
+
+    var individualId = parseInt(individualIdString)||0;
+
+    loadMetadata(individualId);
+    drawTop10CultureChart(individualId);
+    drawSamplesBubbleChart(individualId);
 }
 
 function loadMetadata(individualId){
@@ -76,15 +81,15 @@ function drawTop10CultureChart(individualId){
 
     //filter sample
     var filteredSamples = individualSamples.find(function(sample){
-        return sample.id === individualId;
+        return (parseInt(sample.id)||0) === individualId;
     });
 
     //create trace
     var trace = [{
         type: 'bar',
-        x: filteredSamples.sample_values.splice(0,10).reverse(), //first ten desc
-        y: filteredSamples.otu_ids.splice(0,10).map(d => {return "OTU " + d;}), //first ten desc - Map reversed
-        text: filteredSamples.otu_labels.splice(0,10).reverse(), //first ten desc
+        x: filteredSamples.sample_values.slice(0,10).reverse(), //first ten desc
+        y: filteredSamples.otu_ids.slice(0,10).reverse().map(d => {return "OTU " + d;}), //first ten desc - Map reversed
+        text: filteredSamples.otu_labels.slice(0,10).reverse(), //first ten desc
         orientation: 'h',
         width: 0.8
       }];
@@ -98,4 +103,44 @@ function drawTop10CultureChart(individualId){
     Plotly.newPlot("top-10-cultures", trace, layout)
 }
 
+function drawSamplesBubbleChart(individualId){
 
+    var filteredSamples = individualSamples.find(function(sample){
+        return (parseInt(sample.id)||0) === individualId;
+    });
+
+    var desired_maximum_marker_size = 60;
+
+     //create trace
+     var trace = [{
+        x: filteredSamples.otu_ids,
+        y: filteredSamples.sample_values,
+        mode: 'markers',
+        marker: {
+            size: filteredSamples.sample_values,
+            sizeref: 2.0 * Math.max(...filteredSamples.sample_values) / (desired_maximum_marker_size**2),    
+            sizemode: 'area',
+            color: filteredSamples.otu_ids,
+            colorscale: 'Earth'
+        },
+        text: filteredSamples.otu_labels       
+      }];
+
+      //create layout
+    var layout = {
+        title: "Bacteria Culteres Per Sample",
+        xaxis: {
+            title: {
+              text: 'OTU ID',
+              font: {
+                family: 'Oxygen , sans-serif',
+                size: 12                
+              }
+            },
+          }         
+    }
+
+    //plot
+    Plotly.newPlot("samples-bubble-chart", trace, layout)
+
+}
