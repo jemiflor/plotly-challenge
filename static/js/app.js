@@ -52,6 +52,7 @@ function loadVisualizations(individualIdString){
     loadMetadata(individualId);
     drawTop10CultureChart(individualId);
     drawSamplesBubbleChart(individualId);
+    drawWashFrequencyGauge(individualId);
 }
 
 function loadMetadata(individualId){
@@ -131,16 +132,59 @@ function drawSamplesBubbleChart(individualId){
         title: "Bacteria Culteres Per Sample",
         xaxis: {
             title: {
-              text: 'OTU ID',
-              font: {
-                family: 'Oxygen , sans-serif',
-                size: 12                
-              }
+                text: 'OTU ID',
+                font: {
+                    family: 'Oxygen , sans-serif',
+                    size: 12                
+                }
             },
-          }         
+        }         
     }
 
     //plot
     Plotly.newPlot("samples-bubble-chart", trace, layout)
+}
+
+function drawWashFrequencyGauge(individualId){
+    
+    //Filter metadata
+    var filteredMetaData = individualMetaData.find(function(metaData) {
+        return metaData.id === individualId;
+    });
+
+    var trace = [{
+          domain: { x: [0, 1], y: [0, 1] },
+          value: filteredMetaData.wfreq,
+          title: { text: "Scrubs per week" },
+          type: "indicator",
+          mode: "gauge",
+          gauge: {
+            axis: { range: [null, 9], dtick:1 },
+            threshold: {
+                line: { color: "#800080", width: 4 },
+                thickness: 0.8,
+                value: filteredMetaData.wfreq
+            },
+            steps: [
+                { range: [0, 1], color: "#F4F8F8" },
+                { range: [1, 2], color: "#E9F2F2" },
+                { range: [2, 3], color: "#D4E6E5" },
+                { range: [3, 4], color: "#BED9D8" },
+                { range: [4, 5], color: "#A8CCCD" },
+                { range: [5, 6], color: "#92BFC0" },
+                { range: [6, 7], color: "#7BB4B3" },
+                { range: [7, 8], color: "#64A6A6" },
+                { range: [8, 9], color: "#4B9A9A" }
+              ]                     
+          }
+    }];
+    
+        //create layout
+    var layout = {
+        title: "Belly Button Washing Frequency"             
+    }
+
+    //plot
+    Plotly.newPlot("wash-freq-gauge", trace, layout)
 
 }
